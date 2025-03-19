@@ -1,6 +1,6 @@
-import { User } from "../Models/user.Model"
+import { User } from "../Models/user.Model.js"
 import jwt from 'jsonwebtoken'
-
+import bcrypt from 'bcrypt'
 
 export const register = async (req, res) => {
     try {
@@ -78,7 +78,7 @@ export const login = async (req, res) => {
             expiresIn: '1d'
         })
 
-        user = {
+        let userr = {
             _id: user._id,
             fullName: user.fullname,
             email: user.email,
@@ -89,7 +89,7 @@ export const login = async (req, res) => {
 
         return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpsOnly: true, sameSite: 'strict' }).json({
             message: `Welcome back ${user.fullName}`,
-            user,
+            userr,
             success: true
         })
 
