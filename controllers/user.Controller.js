@@ -109,3 +109,54 @@ export const logout = async (req, res) => {
         console.log("Error in logining out", error);
     }
 }
+
+
+export const updateProfile = async (req, res) => {
+    try {
+
+        const { fullName, email, phoneNumer, bio, skills } = req.body
+        const file = req.file
+        if (!email || !fullName || !phoneNumer || !bio || !skills) {
+            return res.status(400).json({ message: "Something is missing", success: false })
+        }
+
+        // cloudinary ayega idhar  
+        const skillsArray = skills.split(",")
+        const userId = req.id  // middleware authentication
+        let user = await User.findById(userId)
+
+        if (!user) {
+            return res.status(400).json(
+                {
+                    message: "User not found",
+                    success: false
+                }
+            )
+        }
+
+        // Updating data
+        user.fullname = fullName,
+            user.email = email,
+            user.bio = bio,
+            user.phoneNumber = phoneNumer,
+            user.profile.skills = skillsArray
+        // resume come letter here.....
+
+
+        await user.save()
+
+        user = {
+            _id: user._id,
+            fullName: user.fullname,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            role: user.role,
+            profile: user.profile
+        }
+
+
+        return res.status(200).json({ message: "Profile updated successfully", user, success: true })
+    } catch (error) {
+        console.log("Error in updating ", error);
+    }
+}
