@@ -33,6 +33,9 @@
 import cors from 'cors'
 import express from 'express'
 import cookieParser from 'cookie-parser'
+import dotenv from 'dotenv'
+
+dotenv.config()
 const app = express()
 
 app.get('/home', (req, res) => {
@@ -53,7 +56,7 @@ const corsOption = {
 app.use(cors(corsOption))
 
 
-const PORT = 8080
+const PORT = process.env.PORT || 7070
 
 
 app.listen(PORT, () => {
