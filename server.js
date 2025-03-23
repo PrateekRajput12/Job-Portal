@@ -36,6 +36,8 @@ import cookieParser from 'cookie-parser'
 import dotenv from 'dotenv'
 import connectDB from './utils/db.js'
 import userRoute from './routes/user.Route.js'
+
+import companyRoute from './routes/company.route.js'
 dotenv.config()
 const app = express()
 
@@ -62,6 +64,7 @@ const PORT = process.env.PORT || 7070
 // Apis
 
 app.use('/api/v1/user', userRoute)
+app.use('/api/v1/company', companyRoute)
 
 
 

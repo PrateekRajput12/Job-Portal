@@ -116,15 +116,19 @@ export const updateProfile = async (req, res) => {
 
         const { fullName, email, phoneNumer, bio, skills } = req.body
         const file = req.file
-        if (!email || !fullName || !phoneNumer || !bio || !skills) {
-            return res.status(400).json({ message: "Something is missing", success: false })
-        }
-
+        // if (!email || !fullName || !phoneNumer || !bio || !skills) {
+        //     return res.status(400).json({ message: "Something is missing", success: false })
+        // }
+        console.log("Run 1");
         // cloudinary ayega idhar  
-        const skillsArray = skills.split(",")
+        let skillsArray;
+        if (skills) {
+            skillsArray = skills.split(",")
+
+        }
         const userId = req.id  // middleware authentication
         let user = await User.findById(userId)
-
+        console.log("Run 2");
         if (!user) {
             return res.status(400).json(
                 {
@@ -133,28 +137,40 @@ export const updateProfile = async (req, res) => {
                 }
             )
         }
-
+        console.log("Run 3");
         // Updating data
-        user.fullname = fullName,
-            user.email = email,
-            user.bio = bio,
-            user.phoneNumber = phoneNumer,
+        if (fullName) {
+            user.fullName = fullName
+        }
+        if (bio) {
+            user.bio = bio
+        }
+        if (email) {
+            user.email = email
+        }
+        if (phoneNumer) {
+            user.phoneNumber = phoneNumer
+        }
+        if (skillsArray) {
             user.profile.skills = skillsArray
+
+        }
+
         // resume come letter here.....
 
-
+        console.log("Run 4");
         await user.save()
 
         user = {
             _id: user._id,
-            fullName: user.fullname,
+            fullName: user.fullName,
             email: user.email,
             phoneNumber: user.phoneNumber,
             role: user.role,
             profile: user.profile
         }
 
-
+        console.log("Run 5");
         return res.status(200).json({ message: "Profile updated successfully", user, success: true })
     } catch (error) {
         console.log("Error in updating ", error);

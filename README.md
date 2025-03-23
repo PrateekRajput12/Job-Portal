@@ -15,5 +15,13 @@
  - routes created using controller
  - middle are is Authenticated to update profile 
  
-# 5 API CREATED
+# 5 API CREATED  
  - Api created for login logout profile update and signup
+
+# 6 Company
+  - get , register, update , get By id
+  - created
+
+# 7 Job
+ - Job get job,getJobById for student
+ - POstjob For admin created 
