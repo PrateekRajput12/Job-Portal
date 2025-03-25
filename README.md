@@ -25,3 +25,5 @@
 # 7 Job
  - Job get job,getJobById for student
  - POstjob For admin created 
+ - getJobById number of job created by admin
+ - api created and tested using postman 
