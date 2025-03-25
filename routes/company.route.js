@@ -6,8 +6,8 @@ const router = express.Router()
 
 
 router.route("/register").post(isAuthenticated, registerCompany)
-router.route("/get").get(isAuthenticated, getCompany)
-router.route("/get/:id").get(isAuthenticated, getCOmpanyById)
+router.route("/get").get(isAuthenticated, getCompany)  // student
+router.route("/get/:id").get(isAuthenticated, getCOmpanyById)    // student
 router.route("/update/:id").put(isAuthenticated, updateCompany)
 
 

@@ -27,3 +27,11 @@
  - POstjob For admin created 
  - getJobById number of job created by admin
  - api created and tested using postman 
+
+ # 8 Application 
+ - GET Application,GET Applicant, Post Application Status,GET Applied Jobs
+ - all done 
+
+# Remaining 
+- Almost All Backend DOne
+- Only multer and controller remaining for img and logo 
