@@ -2,11 +2,12 @@ import { Company } from '../Models/company.Model.js'
 
 export const registerCompany = async (req, res) => {
     try {
+        console.log(req.body);
         const { companyName } = req.body
 
         if (!companyName) {
             return res.status(400).json({
-                message: "COmpany name required",
+                message: "Company name required",
                 success: false
             })
         }

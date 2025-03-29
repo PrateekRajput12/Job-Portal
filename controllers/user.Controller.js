@@ -1,14 +1,22 @@
 import { User } from "../Models/user.Model.js"
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-
+import getDataUri from "../utils/datauri.js"
+import cloudinary from "../utils/cloudinary.js"
+// import getDataUri from "../utils/datauri.js"
+// import cloudinary from "../utils/cloudinary.js"
+// import { singleUpload } from "../middleware/multer.js"
 export const register = async (req, res) => {
     try {
         const { fullName, email, phoneNumber, password, role } = req.body
-
+        // console.log(fullName, email, phoneNumber, role, password);
         if (!phoneNumber || !fullName || !email || !password || !role) {
             return res.status(401).json({ message: "Something is missing", success: false })
         }
+
+        // const file = req.file
+        // const fileUri = getDataUri(file)
+        // const cloudResponse = await cloudinary.uploader.singleUpload(fileUri.content)
 
 
         const user = await User.findOne({ email })
@@ -28,6 +36,7 @@ export const register = async (req, res) => {
             phoneNumber,
             password: hashedPassword,
             role
+
         })
 
 
@@ -40,6 +49,8 @@ export const register = async (req, res) => {
     }
 }
 
+// export const register = async (req, res) => {
+// }
 
 export const login = async (req, res) => {
     try {
@@ -74,9 +85,11 @@ export const login = async (req, res) => {
             userId: user._id
         }
 
-        const token = await jwt.sign(tokeData, process.env.SECRET_KEY, {
+        console.log({ tokeData });
+        const token = jwt.sign(tokeData, process.env.SECRET_KEY, {
             expiresIn: '1d'
         })
+        console.log("token", token);
 
         user = {
             _id: user._id,
@@ -87,11 +100,23 @@ export const login = async (req, res) => {
             profile: user.profile
         }
 
+        // res.status(200).cookie("token", token, {
+        //     httpOnly: true,
+        //     secure: process.env.NODE_ENV === "production", // Use secure in production
+        //     sameSite: "None", // Needed for cross-origin requests
+        //     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 Days expiry
+        // }).json({
+        //     message: `Welcome back ${user.fullName}`,
+        //     user,
+        //     success: true
+        // })
+
         return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpsOnly: true, sameSite: 'strict' }).json({
             message: `Welcome back ${user.fullName}`,
             user,
             success: true
         })
+
 
     } catch (error) {
         console.log("error in logining", error);
@@ -113,19 +138,40 @@ export const logout = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
     try {
-
-        const { fullName, email, phoneNumer, bio, skills } = req.body
-        const file = req.file
+        console.log(req.body);
+        const { fullName, email, phoneNumber, bio, skills, resume } = req.body
+        // const file = req.file
+        console.log(fullName, email, phoneNumber, bio, skills);
+        // console.log(phoneNumer);
         // if (!email || !fullName || !phoneNumer s|| !bio || !skills) {
         //     return res.status(400).json({ message: "Something is missing", success: false })
         // }
+
         console.log("Run 1");
         // cloudinary ayega idhar  
-        let skillsArray;
-        if (skills) {
-            skillsArray = skills.split(",")
 
+        const file = req.file
+        const fileUri = getDataUri(file)
+        const cloudResponse = await cloudinary.uploader.upload(fileUri.content)
+
+
+        // let skillsArray;
+        // if (skills) {
+        //     // skillsArray = skills.split(",")
+        //     // skillsArray = skills ? skills.split(",").map(skill => skill.trim()) : [];
+        //     skillsArray = Array.isArray(skills) ? skills : [];
+
+
+        // }
+        let skillsArray;
+        if (Array.isArray(skills)) {
+            skillsArray = skills;  // Already an array, no need to split
+        } else if (typeof skills === "string") {
+            skillsArray = skills.split(",").map(skill => skill.trim());  // Convert string to array
+        } else {
+            skillsArray = []; // Default to empty array if skills is missing
         }
+
         const userId = req.id  // middleware authentication
         let user = await User.findById(userId)
         console.log("Run 2");
@@ -143,20 +189,28 @@ export const updateProfile = async (req, res) => {
             user.fullName = fullName
         }
         if (bio) {
-            user.bio = bio
+            user.profile.bio = bio
         }
         if (email) {
             user.email = email
         }
-        if (phoneNumer) {
-            user.phoneNumber = phoneNumer
+        if (phoneNumber) {
+            user.phoneNumber = phoneNumber
         }
         if (skillsArray) {
             user.profile.skills = skillsArray
 
         }
+        if (resume) {
+            user.profile.resume = resume
+        }
 
         // resume come letter here.....
+
+        if (cloudResponse) {
+            user.profile.resume = cloudResponse.secure_url  //save the cloudinary url
+            user.profile.resumeOriginalName = file.originalname //ssave the original file
+        }
 
         console.log("Run 4");
         await user.save()
@@ -166,8 +220,8 @@ export const updateProfile = async (req, res) => {
             fullName: user.fullName,
             email: user.email,
             phoneNumber: user.phoneNumber,
-            role: user.role,
-            profile: user.profile
+            profile: user.profile,
+
         }
 
         console.log("Run 5");
