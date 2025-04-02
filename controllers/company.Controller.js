@@ -1,8 +1,10 @@
 import { Company } from '../Models/company.Model.js'
+import cloudinary from '../utils/cloudinary.js'
+import getDataUri from '../utils/datauri.js'
 
 export const registerCompany = async (req, res) => {
     try {
-        console.log(req.body);
+        // console.log(req.body);
         const { companyName } = req.body
 
         if (!companyName) {
@@ -93,14 +95,25 @@ export const getCOmpanyById = async (req, res) => {
 
 export const updateCompany = async (req, res) => {
     try {
-        const { name, description, location } = req.body
-        const file = req.file
-
+        const { name, description, location, website } = req.body
+        // const file =/ req.file
+        // console.log(name, description, location, website);
+        // console.log("refile", req.file);
         // cloudinay
+        // 
+        // const fileUri = getDataUri(file)
 
+        // const cloudResponse = await cloudinary.uploader.upload(fileUri)
+        // console.log('here');
 
-        const updateData = { name, description, location }
+        const file = req.file
+        const fileUri = getDataUri(file)
+        const cloudResponse = await cloudinary.uploader.upload(fileUri.content)
+        const logo = cloudResponse.secure_url
 
+        const updateData = { name, description, location, website, logo }
+
+        console.log("update", updateData);
         const company = await Company.findByIdAndUpdate(req.params.id, updateData, { new: true })
 
         if (!company) {
