@@ -8,16 +8,11 @@ import cloudinary from "../utils/cloudinary.js"
 // import { singleUpload } from "../middleware/multer.js"
 export const register = async (req, res) => {
     try {
-        // console.log(req.file);
         const { fullName, email, phoneNumber, password, role } = req.body
-        // console.log(fullName, email, phoneNumber, role, password);
         if (!phoneNumber || !fullName || !email || !password || !role) {
             return res.status(401).json({ message: "Something is missing", success: false })
         }
-        // console.log(req.file, "file");
-        // const file = req.file
-        // const fileUri = getDataUri(file)
-        // const cloudResponse = await cloudinary.uploader.singleUpload(fileUri.content)
+
         const file = req.file
         const fileUri = getDataUri(file)
         const cloudResponse = await cloudinary.uploader.upload(fileUri.content)
@@ -51,7 +46,7 @@ export const register = async (req, res) => {
             success: true
         })
     } catch (error) {
-        console.log("Error in registering", error);
+        console.log("Error ", error);
     }
 }
 
@@ -91,11 +86,9 @@ export const login = async (req, res) => {
             userId: user._id
         }
 
-        // console.log({ tokeData });
         const token = jwt.sign(tokeData, process.env.SECRET_KEY, {
             expiresIn: '1d'
         })
-        // console.log("token", token);
 
         user = {
             _id: user._id,
@@ -125,7 +118,7 @@ export const login = async (req, res) => {
 
 
     } catch (error) {
-        console.log("error in logining", error);
+        console.log("error ", error);
     }
 }
 
@@ -137,24 +130,17 @@ export const logout = async (req, res) => {
             success: true
         })
     } catch (error) {
-        console.log("Error in logining out", error);
+        console.log("Error ", error);
     }
 }
 
 
 export const updateProfile = async (req, res) => {
     try {
-        // console.log(req.body);
         const { fullName, email, phoneNumber, bio, skills, resume } = req.body
-        // const file = req.file
-        // console.log(fullName, email, phoneNumber, bio, skills);
-        // console.log(phoneNumer);
-        // if (!email || !fullName || !phoneNumer s|| !bio || !skills) {
-        //     return res.status(400).json({ message: "Something is missing", success: false })
-        // }
 
-        // console.log("Run 1");
-        // cloudinary ayega idhar  
+
+
 
         const file = req.file
         const fileUri = getDataUri(file)
@@ -180,7 +166,6 @@ export const updateProfile = async (req, res) => {
 
         const userId = req.id  // middleware authentication
         let user = await User.findById(userId)
-        // console.log("Run 2");
         if (!user) {
             return res.status(400).json(
                 {
@@ -189,7 +174,7 @@ export const updateProfile = async (req, res) => {
                 }
             )
         }
-        // console.log("Run 3");
+
         // Updating data
         if (fullName) {
             user.fullName = fullName
@@ -218,7 +203,6 @@ export const updateProfile = async (req, res) => {
             user.profile.resumeOriginalName = file.originalname //ssave the original file
         }
 
-        // console.log("Run 4");
         await user.save()
 
         user = {
@@ -230,10 +214,9 @@ export const updateProfile = async (req, res) => {
 
         }
 
-        // console.log("Run 5");
         return res.status(200).json({ message: "Profile updated successfully", user, success: true })
     } catch (error) {
-        console.log("Error in updating ", error);
+        console.log("Error  ", error);
     }
 }
 
@@ -241,7 +224,6 @@ export const updateProfile = async (req, res) => {
 export const getUser = async (req, res) => {
     try {
         const Id = req.body
-        // console.log(req._id);
         if (!Id) {
             return res.status(400).json({
                 message: "User Not authenticated",
