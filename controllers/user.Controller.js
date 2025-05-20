@@ -6,28 +6,87 @@ import cloudinary from "../utils/cloudinary.js"
 // import getDataUri from "../utils/datauri.js"
 // import cloudinary from "../utils/cloudinary.js"
 // import { singleUpload } from "../middleware/multer.js"
+// export const register = async (req, res) => {
+//     try {
+//         const { fullName, email, phoneNumber, password, role } = req?.body
+//         if (!phoneNumber || !fullName || !email || !password || !role) {
+//             return res.status(401).json({ message: "Something is missing", success: false })
+//         }
+
+//         const file = req?.file
+//         const fileUri = getDataUri(file)
+//         const cloudResponse = await cloudinary.uploader.upload(fileUri.content)
+
+//         const user = await User.findOne({ email })
+
+//         if (user) {
+//             return res?.status({
+//                 message: "User already exists with this email",
+//                 success: false
+//             })
+//         }
+//         const hashedPassword = await bcrypt.hash(password, 10)  // passswor, slavalyue  ==>to convet password im hash value to secure 
+
+
+//         await User.create({
+//             fullName,
+//             email,
+//             phoneNumber,
+//             password: hashedPassword,
+//             role,
+//             profile: {
+//                 profilePhoto: cloudResponse.secure_url,
+//             }
+
+//         })
+
+
+//         return res.status(201).json({
+//             message: "Account created successfully",
+//             success: true
+//         })
+//     } catch (error) {
+//         console.log("Error ", error);
+//     }
+// }
 export const register = async (req, res) => {
     try {
-        const { fullName, email, phoneNumber, password, role } = req.body
+        const { fullName, email, phoneNumber, password, role } = req?.body;
+
+        // Check required fields
         if (!phoneNumber || !fullName || !email || !password || !role) {
-            return res.status(401).json({ message: "Something is missing", success: false })
+            return res.status(400).json({
+                message: "Something is missing",
+                success: false
+            });
         }
 
-        const file = req.file
-        const fileUri = getDataUri(file)
-        const cloudResponse = await cloudinary.uploader.upload(fileUri.content)
+        // Check if file exists
+        const file = req?.file;
+        if (!file) {
+            return res.status(400).json({
+                message: "Profile photo is required",
+                success: false
+            });
+        }
 
-        const user = await User.findOne({ email })
-
-        if (user) {
-            return res.status({
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(409).json({
                 message: "User already exists with this email",
                 success: false
-            })
+            });
         }
-        const hashedPassword = await bcrypt.hash(password, 10)  // passswor, slavalyue  ==>to convet password im hash value to secure 
 
+        // Upload profile photo
+        const fileUri = getDataUri(file);
+        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
 
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create new user
         await User.create({
             fullName,
             email,
@@ -35,20 +94,23 @@ export const register = async (req, res) => {
             password: hashedPassword,
             role,
             profile: {
-                profilePhoto: cloudResponse.secure_url,
+                profilePhoto: cloudResponse.secure_url
             }
-
-        })
-
+        });
 
         return res.status(201).json({
             message: "Account created successfully",
             success: true
-        })
+        });
+
     } catch (error) {
-        console.log("Error ", error);
+        console.log("Error in register:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+            success: false
+        });
     }
-}
+};
 
 // export const register = async (req, res) => {
 // }
