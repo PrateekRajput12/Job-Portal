@@ -28,7 +28,7 @@ app.use(cookieParser())
 
 const corsOption = {
     origin: ['http://localhost:5173',
-        "https://jobportalui-black.vercel.app"
+        "https://jobportalui-black.vercel.app", "https://jobportalui-black.vercel.app/login"
     ],
     credentials: true
 }
